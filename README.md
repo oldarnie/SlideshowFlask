@@ -1,4 +1,4 @@
-# SlideshowPi
+# SlideshowFlask
 
 ## Virtuelle Umgebung aktivieren
 
