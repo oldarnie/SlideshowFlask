@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Slideshow</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+
+    <script>
+        window.SLIDESHOW_DURATION = {{ duration }};
+        window.SLIDESHOW_EFFECTS = {{ effects|tojson }};
+    </script>
+    <script src="/static/js/slideshow.js"></script>
+</head>
+<body class="bg-dark text-light" style="overflow:hidden;">
+
+    <a href="/" class="home-button" title="Zurück zur Startseite">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-5H9v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>
+        </svg>
+    </a>
+
+    <div id="slideshow-container">
+        <img id="slide-img" class="slideshow-img effect-slide" src="">
+        <div id="legend-text" class="legend-text hidden">
+            <span class="highlight">The Man, The Myth, The Legend!</span>
+          </div>        
+    </div>
+
+</body>
+</html>
