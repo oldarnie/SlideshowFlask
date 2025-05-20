@@ -1,12 +1,17 @@
-# SlideshowPi
+# SlideshowFlask
 
-## Virtuelle Umgebung aktivieren
+## Virtuelle Umgebung einrichten und aktivieren
 
+```
+python -m venv venv
 venv\Scripts\activate
+```
 
 ## Abhängigkeiten installieren
 
+```
 pip install -r requirements.txt
+```
 
 ## Anwendung starten
 

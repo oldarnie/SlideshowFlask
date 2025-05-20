@@ -171,3 +171,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# application specific
+images.json
+static/uploads/
+logs/
