@@ -10,7 +10,6 @@ from logging import getLogger, FileHandler, Formatter
 load_dotenv()
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
 SLIDESHOW_DURATION = int(os.getenv("SLIDESHOW_DURATION", "5"))
-ENABLE_EFFECTS = os.getenv("ENABLE_EFFECTS", "fade,slide,zoom").split(",")
 
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 LOG_FOLDER = os.path.join("logs")
@@ -71,7 +70,6 @@ def upload():
         return redirect(url_for("upload"))
     return render_template("upload.html")
 
-# Admin Login + Page
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
     if request.method == "POST":
@@ -86,7 +84,14 @@ def admin():
         return render_template("admin.html", login=True)
 
     images = load_images()
-    return render_template("admin.html", images=images, login=False)
+    legend_texts = ""
+    try:
+        with open("legend_texts.json", encoding="utf-8") as f:
+            legend_texts = json.dumps(json.load(f), ensure_ascii=False, indent=2)
+    except Exception:
+        legend_texts = "[]"
+    return render_template("admin.html", images=images, login=False, legend_texts=legend_texts)
+
 
 @app.route("/logout")
 def logout():
@@ -109,10 +114,17 @@ def toggle_image():
 # Slideshow-Frontend
 @app.route("/slideshow")
 def slideshow():
+
+    logger.info(f"Diashow gestartet")
+
+    with open("legend_texts.json", encoding="utf-8") as f:
+        legend_sentences = json.load(f)
+
+    logger.info(f"LegendSentences: {legend_sentences}")
+
     return render_template(
         "slideshow.html",
-        duration=SLIDESHOW_DURATION,
-        effects=ENABLE_EFFECTS
+        legend_sentences=legend_sentences
     )
 
 # API: Aktive Bilderliste
@@ -125,6 +137,30 @@ def api_images():
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
+
+@app.route("/api/legend_texte")
+def get_legend_texte():
+    with open("legend_texts.json", encoding="utf-8") as f:
+        texte = json.load(f)
+    return jsonify(texte)
+
+@app.route("/admin/edit_legend", methods=["POST"])
+def edit_legend():
+    if not session.get("admin"):
+        return "Unauthorized", 401
+    # Der Inhalt kommt als Text-String
+    new_content = request.form.get("legend_texts")
+    try:
+        data = json.loads(new_content)
+    except Exception as e:
+        flash("Fehler im JSON-Format!", "danger")
+        return redirect(url_for("admin"))
+
+    with open("legend_texts.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    flash("Legendentexte gespeichert!", "success")
+    return redirect(url_for("admin"))
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)

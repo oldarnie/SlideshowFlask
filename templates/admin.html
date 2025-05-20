@@ -51,6 +51,23 @@
             </div>
         {% endif %}
     </div>
+
+    {% if not login %}
+    <div class="container mt-5 p-3 rounded bg-dark shadow">
+        <hr class="mb-3">
+        <h3>Legendentexte bearbeiten (JSON)</h3>
+        <form method="POST" action="{{ url_for('edit_legend') }}">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <label for="legend_texts" class="form-label">JSON-Inhalt:</label>
+                    <textarea id="legend_texts" name="legend_texts" rows="8" class="form-control font-monospace" required>{{ legend_texts|e }}</textarea>
+                </div>
+            </div>
+            <button class="btn btn-success" type="submit">Speichern</button>
+        </form>
+    </div>
+    {% endif %}
+    
     <script>
 function toggleImage(event, filename) {
     event.preventDefault();

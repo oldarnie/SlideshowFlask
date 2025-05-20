@@ -126,7 +126,7 @@ footer {
     transform: translate(-50%, 0) scale(0.98);
     width: 90%;
     text-align: center;
-    font-size: 3.4rem;           /* << Deutlich größer! */
+    font-size: 2.2rem;           /* << Deutlich größer! */
     line-height: 1.15;           /* Für kompakten Look */
     color: #fff;
     background: rgba(0,0,0,0.36);
@@ -136,7 +136,7 @@ footer {
     transition: opacity 1.2s cubic-bezier(.42,0,.58,1), 
                 transform 1.2s cubic-bezier(.42,0,.58,1);
     text-shadow: 0 8px 36px rgba(0,0,0,0.48), 0 2px 8px #000;
-    letter-spacing: 2.2px;       /* Etwas mehr Abstand zwischen den Buchstaben */
+    letter-spacing: 1.8px;       /* Etwas mehr Abstand zwischen den Buchstaben */
     pointer-events: none;
     font-weight: 800;            /* Fett für starke Wirkung */
     font-family: 'Oswald', Arial, Helvetica, sans-serif; /* Optional für einen modernen Look */

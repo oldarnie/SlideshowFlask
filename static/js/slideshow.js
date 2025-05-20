@@ -1,14 +1,8 @@
-let duration = 5; // wird vom Template überschrieben
+let duration = 10; // wird vom Template überschrieben
 let images = [];
+let legendSentences = [];
 let index = 0;
 let timer = null;
-
-const legendSentences = [
-    "The Man, The Myth, The Legend!",
-    "Harry, bleib so wie Du bist!",
-    "Happy Birthday Harry!!!",
-    "Volle Kanne Hoschis!"
-  ];
 
 function shuffle(array) {
     // Fisher-Yates Shuffle
@@ -22,52 +16,47 @@ function showImage() {
     if (images.length === 0) return;
     const img = document.getElementById("slide-img");
     const data = images[index % images.length];
-    void img.offsetWidth;
-    img.src = "/static/uploads/" + data.filename;
-}
-
-function showImage() {
-    if (images.length === 0) return;
-    const img = document.getElementById("slide-img");
-    const data = images[index % images.length];
 
     // Effekt-Klasse entfernen, um die Animation zu resetten
     img.classList.remove('active');
 
-    // Jetzt das Bild wechseln und kurz warten, bevor 'active' wieder gesetzt wird
     setTimeout(() => {
         img.src = "/static/uploads/" + data.filename;
-
-        // Wenn das Bild bereits geladen ist, kann die Animation zu schnell ablaufen.
-        // Mit 'onload' sicherstellen, dass das Bild angezeigt wird, nachdem es geladen ist.
         img.onload = () => {
             img.classList.add('active');
-
             delayedShowLegendText();
-
         };
-    }, 50); // 50ms reichen meistens, bei Bedarf erhöhen
+    }, 1000);
 }
 
+async function loadLegendSentences() {
+    let res = await fetch("/api/legend_texte?" + new Date().getTime());
+    legendSentences = await res.json();
+}
 
-async function loadImagesAndContinue(nextStep) {
-    let res = await fetch("/api/images");
+async function loadImagesAndContinue() {
+    let res = await fetch("/api/images?" + new Date().getTime());
     images = await res.json();
     if (images.length > 0) {
         shuffle(images);
         index = 0;
         showImage();
-        if (typeof nextStep === "function") nextStep();
     }
+}
+
+async function loadLegendSentences() {
+    let res = await fetch("/api/legend_texte?" + new Date().getTime());
+    legendSentences = await res.json();
 }
 
 function nextImage() {
     if (images.length === 0) return;
     index++;
     if (index >= images.length) {
-        // Am Ende: Neu laden (inkl. Shuffle & Status)
-        loadImagesAndContinue(() => {
-            // Nach neuem Laden weiterwechseln (d.h. erstes Bild des neuen Satzes)
+        Promise.all([
+            loadImagesAndContinue(),
+            loadLegendSentences()
+        ]).then(() => {
             clearInterval(timer);
             timer = setInterval(nextImage, duration * 1000);
         });
@@ -77,12 +66,23 @@ function nextImage() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    if (window.SLIDESHOW_DURATION) duration = window.SLIDESHOW_DURATION;
-    loadImagesAndContinue(() => {
-        timer = setInterval(nextImage, duration * 1000);
+    loadLegendSentences().then(() => {
+        loadImagesAndContinue().then(() => {
+            timer = setInterval(nextImage, duration * 1000);
+        });
     });
 });
 
+let lastIndex = -1; // Startwert, der außerhalb deines möglichen Indexbereichs liegt
+
+function getRandomSentence() {
+    let newIndex;
+    do {
+        newIndex = Math.floor(Math.random() * legendSentences.length);
+    } while (newIndex === lastIndex && legendSentences.length > 1); // Nur wiederholen, wenn mehr als 1 Satz vorhanden ist
+    lastIndex = newIndex;
+    return legendSentences[newIndex];
+}
 
 // Funktion, die den Text nach 3s einblendet und nach 5s wieder ausblendet
 function delayedShowLegendText() {
@@ -90,7 +90,7 @@ function delayedShowLegendText() {
     const highlightSpan = textDiv.querySelector('.highlight');
   
     // Zufälligen Satz wählen
-    const randomText = legendSentences[Math.floor(Math.random() * legendSentences.length)];
+    const randomText = getRandomSentence();
     highlightSpan.textContent = randomText;
   
     // Nach 3 Sekunden einblenden
@@ -107,17 +107,6 @@ function delayedShowLegendText() {
     }, 3000);
   }
 
-/*
-function showLegendText() {
-    const text = document.getElementById('legend-text');
-    text.classList.add('visible');
-    text.classList.remove('hidden');
-    // Optional: Nach 4 Sekunden wieder ausblenden
-    setTimeout(() => {
-      text.classList.remove('visible');
-      text.classList.add('hidden');
-    }, 5000);
-  }
-*/
+
 
 
